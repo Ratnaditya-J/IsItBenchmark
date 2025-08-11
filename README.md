@@ -45,6 +45,71 @@ python main.py analyze "What is the capital of France?"
 - **Safety Benchmarks:** AgentHarm, Aegis Safety, CBRN Safety
 - **Total Questions:** 49,159+ across 9 datasets
 
+## 🔧 Model Training Setup
+
+**Important:** Since the pre-trained model files are large (255MB+), they are not included in the GitHub repository. You need to train the specialized model locally using the provided training scripts.
+
+### Quick Start (Recommended)
+```bash
+# One-time model training (uses DistilBERT by default - best CPU performance)
+python scripts/generate_pretrained_model.py
+
+# The model will be saved to: models/pretrained_specialized_detector/
+```
+
+### Advanced Model Training Options
+
+**Available Models:**
+```bash
+# List all available models
+python scripts/generate_pretrained_model.py --list-models
+
+# Available options:
+# - distilbert (default, fastest CPU training)
+# - bert (higher accuracy, slower training)
+# - roberta (best accuracy, slowest training)
+# - gpt2 (generative approach)
+# - dialogpt (conversation-focused)
+```
+
+**Train with Specific Model:**
+```bash
+# Train with BERT for higher accuracy
+python scripts/generate_pretrained_model.py --model bert
+
+# Train with RoBERTa for best accuracy (longer training time)
+python scripts/generate_pretrained_model.py --model roberta
+```
+
+**Training Requirements:**
+- **Hardware:** CPU-compatible (no GPU required)
+- **Memory:** 8GB+ RAM recommended
+- **Storage:** 2GB+ free space for model and data
+- **Time:** 15-45 minutes depending on model choice
+- **Dependencies:** All included in requirements.txt
+
+**Training Process:**
+1. **Data Loading:** Downloads and processes 49,159+ benchmark questions
+2. **Model Training:** Fine-tunes selected model on contamination detection
+3. **Validation:** Tests model performance on held-out data
+4. **Packaging:** Saves model with metadata for immediate use
+
+**Expected Output:**
+```
+✅ Model training completed successfully!
+📁 Model saved to: models/pretrained_specialized_detector/
+🎯 Training accuracy: 99.8%
+⚡ Ready for use with: python main.py analyze "your prompt"
+```
+
+### Verify Installation
+```bash
+# Test the trained model
+python main.py analyze "What is the capital of France?"
+
+# Expected output shows contamination probability and matches
+```
+
 ## 🎯 Key Use Cases
 
 ### 🔬 Academic & Research
