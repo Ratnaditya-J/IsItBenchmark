@@ -10,12 +10,21 @@ IsItBenchmark detects when training prompts contain benchmark questions using ad
 
 As AI models become increasingly powerful, a critical problem has emerged: **benchmark contamination**. Many large language models are inadvertently (or deliberately) trained on benchmark datasets, leading to artificially inflated performance scores that don't reflect true capabilities.
 
+### 📚 Research Foundation
+
+This problem is well-documented in academic literature:
+- **[[Data Contamination Survey](https://arxiv.org/abs/2406.04244)]** - Comprehensive analysis of benchmark data contamination in LLMs
+- **[[NLP Evaluation Crisis](https://arxiv.org/abs/2310.18018)]** - Position paper on the crisis in NLP evaluation due to contamination
+- **[[Data Laundering](https://arxiv.org/abs/2412.15255)]** - Exposes sophisticated benchmark gaming through knowledge distillation
+- **[[LiveBench](https://arxiv.org/abs/2406.19314)]** - Contamination-resistant benchmark addressing evaluation integrity
+
 **The Problem:**
-- 📈 **Inflated Scores:** Models appear more capable than they actually are
+- 📈 **Inflated Scores:** Models appear more capable than they actually are [[GPT-3/4 Contamination](https://arxiv.org/abs/2005.14165)]
 - 🔍 **Hidden Contamination:** Difficult to detect when models have seen test data
 - ⚖️ **Unfair Comparisons:** Contaminated models compete against clean models
 - 🏛️ **Research Integrity:** Academic and industry evaluations become unreliable
 - 💰 **Economic Impact:** Billions invested based on misleading benchmarks
+- 🎭 **Sophisticated Gaming:** Advanced techniques like "data laundering" can bypass detection
 
 **My Solution:**
 IsItBenchmark is the world's first specialized system designed specifically to detect benchmark contamination using:
