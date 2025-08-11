@@ -1,0 +1,65 @@
+{
+  "model_info": {
+    "name": "IsItBenchmark Specialized Contamination Detector",
+    "version": "1.0.0",
+    "description": "Pre-trained DistilBERT model for benchmark contamination detection",
+    "architecture": "DistilBERT-base with sequence classification head",
+    "training_date": "2025-08-11",
+    "model_size_mb": 268.0,
+    "parameters": 66000000
+  },
+  "training_info": {
+    "training_samples": 25000,
+    "benchmark_questions_used": 90000,
+    "contamination_patterns": 14,
+    "training_epochs": 2,
+    "final_accuracy": 1.0,
+    "final_f1_score": 0.0
+  },
+  "benchmark_coverage": {
+    "total_benchmarks": 9,
+    "total_questions": 90000,
+    "benchmark_breakdown": {
+      "MMLU": {
+        "question_count": 15908
+      },
+      "HellaSwag": {
+        "question_count": 10042
+      },
+      "ARC": {
+        "question_count": 7787
+      },
+      "TruthfulQA": {
+        "question_count": 817
+      },
+      "GSM8K": {
+        "question_count": 8792
+      },
+      "HumanEval": {
+        "question_count": 164
+      },
+      "AgentHarm": {
+        "question_count": 110
+      },
+      "Aegis Safety": {
+        "question_count": 26
+      },
+      "CBRN": {
+        "question_count": 200
+      }
+    }
+  },
+  "usage_info": {
+    "input_format": "text string",
+    "output_format": "contamination probability (0-1)",
+    "recommended_threshold": 0.8,
+    "max_input_length": 512,
+    "inference_time_ms": "<100ms typical"
+  },
+  "performance_benchmarks": {
+    "accuracy": 1.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0
+  }
+}

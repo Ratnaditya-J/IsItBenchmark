@@ -1,0 +1,101 @@
+# Weights & Biases Hyperparameter Sweep Configuration
+# For IsItBenchmark Specialized Contamination Detection Model Training
+
+program: main.py
+method: bayes
+metric:
+  name: val/f1_score
+  goal: maximize
+
+parameters:
+  # Core Training Parameters
+  learning_rate:
+    distribution: log_uniform_values
+    min: 1e-6
+    max: 1e-3
+  
+  batch_size:
+    values: [8, 16, 32, 64]
+  
+  num_epochs:
+    values: [3, 5, 7, 10]
+  
+  weight_decay:
+    distribution: uniform
+    min: 0.0
+    max: 0.1
+  
+  warmup_steps:
+    values: [100, 500, 1000]
+  
+  # Data Configuration
+  positive_ratio:
+    distribution: uniform
+    min: 0.3
+    max: 0.7
+  
+  num_samples:
+    values: [5000, 10000, 20000, 50000]
+  
+  max_length:
+    values: [256, 512, 1024]
+  
+  # Model Architecture
+  model_name:
+    values: 
+      - "microsoft/DialoGPT-medium"
+      - "microsoft/DialoGPT-small" 
+      - "gpt2"
+      - "gpt2-medium"
+      - "distilgpt2"
+  
+  # Optimization Settings
+  gradient_accumulation_steps:
+    values: [1, 2, 4]
+  
+  max_grad_norm:
+    distribution: uniform
+    min: 0.5
+    max: 2.0
+  
+  # Advanced Parameters
+  dropout_rate:
+    distribution: uniform
+    min: 0.0
+    max: 0.3
+  
+  early_stopping_patience:
+    values: [2, 3, 5]
+
+# Fixed parameters for all runs
+command:
+  - ${program}
+  - "train-model"
+  - "--use-wandb"
+  - "--wandb-project"
+  - "isitbenchmark-contamination-sweep"
+  - "--model-name"
+  - ${model_name}
+  - "--num-samples"
+  - ${num_samples}
+  - "--positive-ratio"
+  - ${positive_ratio}
+  - "--epochs"
+  - ${num_epochs}
+  - "--batch-size"
+  - ${batch_size}
+  - "--learning-rate"
+  - ${learning_rate}
+  - "--max-length"
+  - ${max_length}
+
+# Sweep configuration
+name: "contamination-detection-optimization"
+description: "Hyperparameter optimization for specialized contamination detection model"
+
+# Early termination for poor performing runs
+early_terminate:
+  type: hyperband
+  min_iter: 3
+  eta: 2
+  s: 2
