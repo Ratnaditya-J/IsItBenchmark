@@ -251,7 +251,7 @@ pip install -r requirements.txt
 
 ### **Step 2: Train Custom Model**
 
-**Quick Start (DistilBERT - Recommended):**
+**Quick Start (DistilBERT):**
 ```bash
 # Train with default settings (fastest)
 python scripts/generate_pretrained_model.py
