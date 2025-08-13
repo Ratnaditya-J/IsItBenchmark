@@ -458,7 +458,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **📂 Repository:** [github.com/Ratnaditya-J/IsItBenchmark](https://github.com/Ratnaditya-J/IsItBenchmark)
 - **🐛 Bug Reports:** [GitHub Issues](https://github.com/Ratnaditya-J/IsItBenchmark/issues)
-- **💬 Discussions:** [GitHub Discussions](https://github.com/Ratnaditya-J/IsItBenchmark/discussions)
 - **📧 Contact:** Open an issue for questions or collaboration opportunities
 
 ---
