@@ -53,7 +53,7 @@ class EnsembleConfig:
     medium_confidence_threshold: float = 0.6
     
     # Ensemble method
-    combination_method: str = "weighted_average"  # "weighted_average", "voting", "max"
+    combination_method: str = "max"  # "weighted_average", "voting", "max"
     
     # Individual matcher configs
     semantic_config: Dict[str, Any] = None
@@ -66,7 +66,7 @@ class EnsembleConfig:
         if self.semantic_config is None:
             self.semantic_config = {
                 'model_name': 'all-MiniLM-L6-v2',
-                'similarity_threshold': 0.7
+                'similarity_threshold': 0.55
             }
         
         if self.llm_config is None:
@@ -189,7 +189,7 @@ class EnsembleMatcher(BaseMatcher):
         logger.info("Ensemble matcher cleaned up")
     
     def find_matches(self, query: str, candidates: List[Dict[str, Any]], 
-                    max_matches: int = 10) -> List[EnsembleMatchResult]:
+                    threshold: float = 0.5, max_matches: int = 10) -> List[EnsembleMatchResult]:
         """Find matches using ensemble of all available methods."""
         if not self.is_initialized:
             logger.error("Ensemble matcher not initialized")
@@ -204,7 +204,16 @@ class EnsembleMatcher(BaseMatcher):
         for matcher_name, matcher in self.matchers.items():
             try:
                 logger.info(f"Running {matcher_name} matcher...")
-                results = matcher.find_matches(query, candidates, max_matches)
+                # Pass threshold to matchers that support it
+                if hasattr(matcher, 'find_matches'):
+                    import inspect
+                    sig = inspect.signature(matcher.find_matches)
+                    if 'threshold' in sig.parameters:
+                        results = matcher.find_matches(query, candidates, threshold=threshold, max_matches=max_matches)
+                    else:
+                        results = matcher.find_matches(query, candidates, max_matches=max_matches)
+                else:
+                    results = []
                 all_results[matcher_name] = results
                 
                 # Extract scores for each candidate
@@ -339,7 +348,9 @@ class EnsembleMatcher(BaseMatcher):
                     matcher_scores[matcher_name] = 0.0
             
             # Calculate ensemble score
+            logger.info(f"Matcher scores for {benchmark_name}: {matcher_scores}")
             ensemble_score = self._calculate_ensemble_score(matcher_scores)
+            logger.info(f"Calculated ensemble score: {ensemble_score} using method: {self.config.combination_method}")
             
             # Calculate confidence and agreement
             confidence_level, agreement_score = self._calculate_confidence(matcher_scores)
@@ -352,23 +363,32 @@ class EnsembleMatcher(BaseMatcher):
             template_result = None
             for results in all_results.values():
                 for result in results:
-                    if result.benchmark_name == benchmark_name:
+                    result_benchmark_name = result.metadata.get("benchmark_name", "Unknown")
+                    if result_benchmark_name == benchmark_name:
                         template_result = result
                         break
                 if template_result:
                     break
             
             if template_result:
+                # Create metadata with benchmark information and ensemble details
+                ensemble_metadata = {
+                    'benchmark_name': benchmark_name,
+                    'benchmark_type': template_result.metadata.get('benchmark_type', 'unknown'),
+                    'source_url': template_result.metadata.get('source_url', ''),
+                    'publication_date': template_result.metadata.get('publication_date', ''),
+                    'dataset_version': template_result.metadata.get('dataset_version', ''),
+                    'individual_results': matcher_results,
+                    'ensemble_method': self.config.combination_method,
+                    'total_matchers': len(self.matchers)
+                }
+                
                 ensemble_result = EnsembleMatchResult(
-                    benchmark_name=benchmark_name,
-                    score=ensemble_score,
                     text=f"Ensemble detection from {len(matcher_scores)} methods: {benchmark_name}",
-                    method="ensemble",
-                    metadata={
-                        'individual_results': matcher_results,
-                        'ensemble_method': self.config.combination_method,
-                        'total_matchers': len(self.matchers)
-                    },
+                    similarity_score=ensemble_score,
+                    metadata=ensemble_metadata,
+                    exact_match=any(result.exact_match for results in all_results.values() for result in results if result.metadata.get('benchmark_name') == benchmark_name),
+                    benchmark_type=template_result.metadata.get('benchmark_type', 'unknown'),
                     individual_scores=matcher_scores,
                     confidence_level=confidence_level,
                     agreement_score=agreement_score,
@@ -377,7 +397,7 @@ class EnsembleMatcher(BaseMatcher):
                 ensemble_results.append(ensemble_result)
         
         # Sort by ensemble score and limit results
-        ensemble_results.sort(key=lambda x: x.score, reverse=True)
+        ensemble_results.sort(key=lambda x: x.similarity_score, reverse=True)
         return ensemble_results[:max_matches]
     
     def _calculate_ensemble_score(self, matcher_scores: Dict[str, float]) -> float:
@@ -407,7 +427,7 @@ class EnsembleMatcher(BaseMatcher):
                 # Use different thresholds for different matchers
                 threshold = 0.5  # Default threshold
                 if name == 'semantic':
-                    threshold = self.config.semantic_config.get('similarity_threshold', 0.7)
+                    threshold = self.config.semantic_config.get('similarity_threshold', 0.55)
                 elif name == 'membership_inference':
                     threshold = self.config.membership_inference_config.get('confidence_threshold', 0.8)
                 elif name == 'ngram':

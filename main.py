@@ -104,13 +104,23 @@ def analyze_prompt(prompt: str, config_path: str = None, debug: bool = False, ma
     if result.matches:
         print(f"\n🎯 MATCHES FOUND ({len(result.matches)}):")
         for i, match in enumerate(result.matches, 1):
-            benchmark_name = match.metadata.get('benchmark_name', 'Unknown')
-            benchmark_type = match.metadata.get('benchmark_type', 'Unknown')
+            # Handle both MatchResult (with metadata) and BenchmarkMatch (with direct attributes)
+            if hasattr(match, 'metadata'):
+                benchmark_name = match.metadata.get('benchmark_name', 'Unknown')
+                benchmark_type = match.metadata.get('benchmark_type', 'Unknown')
+                source_url = match.metadata.get('source_url')
+                text = match.text
+            else:
+                # BenchmarkMatch object
+                benchmark_name = getattr(match, 'benchmark_name', 'Unknown')
+                benchmark_type = getattr(match, 'benchmark_type', 'Unknown')
+                source_url = getattr(match, 'source_url', None)
+                text = getattr(match, 'matched_text', 'No text available')
+            
             print(f"\n{i}. {benchmark_name} ({benchmark_type})")
             print(f"   Similarity: {match.similarity_score:.1%}")
             print(f"   Exact Match: {'Yes' if match.exact_match else 'No'}")
-            print(f"   Text: \"{match.text[:100]}{'...' if len(match.text) > 100 else ''}\"")
-            source_url = match.metadata.get('source_url')
+            print(f"   Text: \"{text[:100]}{'...' if len(text) > 100 else ''}\"")
             if source_url:
                 print(f"   Source: {source_url}")
     else:
@@ -119,8 +129,15 @@ def analyze_prompt(prompt: str, config_path: str = None, debug: bool = False, ma
     if result.matches:
         print(f"\n🏆 TOP MATCH:")
         top = result.matches[0]  # First match is highest scoring
-        benchmark_name = top.metadata.get('benchmark_name', 'Unknown')
-        benchmark_type = top.metadata.get('benchmark_type', 'Unknown')
+        # Handle both MatchResult (with metadata) and BenchmarkMatch (with direct attributes)
+        if hasattr(top, 'metadata'):
+            benchmark_name = top.metadata.get('benchmark_name', 'Unknown')
+            benchmark_type = top.metadata.get('benchmark_type', 'Unknown')
+        else:
+            # BenchmarkMatch object
+            benchmark_name = getattr(top, 'benchmark_name', 'Unknown')
+            benchmark_type = getattr(top, 'benchmark_type', 'Unknown')
+        
         print(f"   Benchmark: {benchmark_name}")
         print(f"   Confidence: {top.similarity_score:.1%}")
         print(f"   Type: {benchmark_type}")
@@ -205,7 +222,12 @@ def run_demo(config_path: str = None, debug: bool = False, matcher: str = "seman
         if result.matches:
             print(f"   Matches: {len(result.matches)} found")
             top_match = result.matches[0]  # First match is highest scoring
-            benchmark_name = top_match.metadata.get('benchmark_name', 'Unknown')
+            # Handle both MatchResult (with metadata) and BenchmarkMatch (with direct attributes)
+            if hasattr(top_match, 'metadata'):
+                benchmark_name = top_match.metadata.get('benchmark_name', 'Unknown')
+            else:
+                # BenchmarkMatch object
+                benchmark_name = getattr(top_match, 'benchmark_name', 'Unknown')
             print(f"   Top Match: {benchmark_name} ({top_match.similarity_score:.1%})")
         else:
             print("   Matches: None found")

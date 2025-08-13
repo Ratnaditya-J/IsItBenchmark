@@ -94,7 +94,7 @@ class MatcherFactory:
                 "membership_inference_weight": 0.2,
                 "high_confidence_threshold": 0.8,
                 "medium_confidence_threshold": 0.6,
-                "combination_method": "weighted_average"
+                "combination_method": "max"
             },
             MatcherType.SPECIALIZED: {
                 "model_path": "models/specialized_contamination_detector",
@@ -344,12 +344,12 @@ class HybridMatcher(BaseMatcher):
         secondary_candidates = []
         for match in primary_matches:
             candidate = {
-                "question_text": match.matched_text,
-                "benchmark_name": match.benchmark_name,
-                "benchmark_type": match.benchmark_type.value if hasattr(match.benchmark_type, 'value') else str(match.benchmark_type),
-                "source_url": match.source_url,
-                "publication_date": match.publication_date,
-                "dataset_version": match.dataset_version,
+                "question_text": match.text,
+                "benchmark_name": match.metadata.get("benchmark_name", "Unknown"),
+                "benchmark_type": match.metadata.get("benchmark_type", "unknown"),
+                "source_url": match.metadata.get("source_url", ""),
+                "publication_date": match.metadata.get("publication_date", ""),
+                "dataset_version": match.metadata.get("dataset_version", ""),
             }
             secondary_candidates.append(candidate)
         

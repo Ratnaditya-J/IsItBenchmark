@@ -556,7 +556,7 @@ class DatasetDownloader:
                     formatted_question += f"\n{label}. {choice}"
                 
                 questions.append({
-                    "text": formatted_question,
+                    "question_text": formatted_question,
                     "answer": correct_answer,
                     "category": "science_reasoning",
                     "difficulty": "easy",
@@ -581,7 +581,7 @@ class DatasetDownloader:
                     formatted_question += f"\n{label}. {choice}"
                 
                 questions.append({
-                    "text": formatted_question,
+                    "question_text": formatted_question,
                     "answer": correct_answer,
                     "category": "science_reasoning",
                     "difficulty": "hard",

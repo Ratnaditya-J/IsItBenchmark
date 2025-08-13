@@ -101,24 +101,8 @@ class SemanticMatcher(BaseMatcher):
         results = []
         
         try:
-            # For now, use the mock implementation
-            # In a real implementation, this would use the candidates parameter
-            mock_results = self._mock_semantic_query(query, threshold, max_matches)
-            
-            for result in mock_results:
-                match_result = MatchResult(
-                    text=result["matched_text"],
-                    similarity_score=result["similarity_score"],
-                    exact_match=result["similarity_score"] >= 0.95,
-                    metadata={
-                        "benchmark_name": result["benchmark_name"],
-                        "benchmark_type": result["benchmark_type"],
-                        "source_url": result.get("source_url"),
-                        "publication_date": result.get("publication_date"),
-                        "embedding_model": result.get("embedding_model"),
-                    }
-                )
-                results.append(match_result)
+            # Real semantic matching against database questions
+            results = self._perform_real_semantic_matching(query, candidates, threshold, max_matches)
             
         except Exception as e:
             self.logger.error(f"Error finding semantic matches: {str(e)}")
@@ -265,6 +249,179 @@ class SemanticMatcher(BaseMatcher):
             return max(0.0, min(1.0, (similarity + 1) / 2))
         except:
             return 0.0
+    
+    def _perform_real_semantic_matching(
+        self, 
+        query: str, 
+        candidates: List[Dict[str, Any]], 
+        threshold: float, 
+        max_matches: int
+    ) -> List[MatchResult]:
+        """
+        Perform real semantic matching against database questions.
+        
+        Args:
+            query: Input query to match
+            candidates: List of benchmark candidates (dictionaries)
+            threshold: Minimum similarity threshold
+            max_matches: Maximum number of matches to return
+            
+        Returns:
+            List of MatchResult objects
+        """
+        results = []
+        
+        try:
+            import sqlite3
+            import os
+            
+            # Connect to database
+            db_path = os.path.join(os.getcwd(), 'data', 'benchmarks.db')
+            if not os.path.exists(db_path):
+                self.logger.warning(f"Database not found at {db_path}")
+                return results
+                
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            # Get benchmark names from candidates
+            benchmark_names = [candidate.get('name', '') for candidate in candidates]
+            benchmark_names = [name for name in benchmark_names if name]  # Filter empty names
+            
+            if not benchmark_names:
+                self.logger.warning("No valid benchmark names in candidates")
+                return results
+            
+            # Query database for questions from specified benchmarks
+            # Only select questions with non-empty text and prioritize benchmarks with content
+            placeholders = ','.join(['?' for _ in benchmark_names])
+            query_sql = f'''
+            SELECT q.question_text, b.name, b.type 
+            FROM questions q 
+            JOIN benchmarks b ON q.benchmark_id = b.id 
+            WHERE b.name IN ({placeholders}) 
+                AND q.question_text IS NOT NULL 
+                AND q.question_text != ''
+            ORDER BY b.name
+            LIMIT 1000
+            '''
+            
+            self.logger.info(f"Executing query with benchmark names: {benchmark_names}")
+            self.logger.info(f"SQL query: {query_sql}")
+            cursor.execute(query_sql, benchmark_names)
+            db_questions = cursor.fetchall()
+            
+            self.logger.info(f"Retrieved {len(db_questions)} questions from database for semantic matching")
+            
+            # Debug: show first few questions to verify data quality
+            if db_questions:
+                self.logger.info(f"Sample questions from database:")
+                for i, (question_text, benchmark_name, benchmark_type) in enumerate(db_questions[:3]):
+                    self.logger.info(f"  {i+1}. [{benchmark_name}] {question_text}")
+            
+            if not db_questions:
+                self.logger.warning("No questions found in database for specified benchmarks")
+                conn.close()
+                return results
+            
+            # Compute embeddings for query
+            query_embedding = self.model.encode([query], normalize_embeddings=True)
+            
+            # Compute embeddings for database questions in batches
+            question_texts = [q[0] for q in db_questions]
+            question_embeddings = self.model.encode(question_texts, batch_size=self.batch_size, normalize_embeddings=True)
+            
+            # Calculate similarities using numpy (more robust than sklearn for edge cases)
+            import numpy as np
+            
+            # Ensure embeddings are valid (no NaN or inf)
+            query_emb = query_embedding[0]
+            if np.any(np.isnan(query_emb)) or np.any(np.isinf(query_emb)):
+                self.logger.error("Query embedding contains NaN or inf values")
+                return results
+            
+            # Check for NaN/inf in question embeddings
+            valid_indices = []
+            valid_embeddings = []
+            valid_questions = []
+            
+            for i, emb in enumerate(question_embeddings):
+                if not (np.any(np.isnan(emb)) or np.any(np.isinf(emb))):
+                    valid_indices.append(i)
+                    valid_embeddings.append(emb)
+                    valid_questions.append(db_questions[i])
+            
+            if not valid_embeddings:
+                self.logger.error("No valid question embeddings found")
+                return results
+            
+            self.logger.info(f"Using {len(valid_embeddings)} valid embeddings out of {len(question_embeddings)} total")
+            
+            # Calculate cosine similarities manually
+            valid_embeddings = np.array(valid_embeddings)
+            similarities = np.dot(valid_embeddings, query_emb)
+            
+            # Update db_questions to only include valid ones
+            db_questions = valid_questions
+            
+            # Find matches above threshold and log top scores for debugging
+            all_matches = []
+            matches = []
+            for i, (similarity, (question_text, benchmark_name, benchmark_type)) in enumerate(zip(similarities, db_questions)):
+                all_matches.append({
+                    'similarity': similarity,
+                    'question': question_text,
+                    'benchmark_name': benchmark_name,
+                    'benchmark_type': benchmark_type
+                })
+                if similarity >= threshold:
+                    matches.append({
+                        'similarity': similarity,
+                        'question': question_text,
+                        'benchmark_name': benchmark_name,
+                        'benchmark_type': benchmark_type
+                    })
+            
+            # Sort all matches by similarity for debugging
+            all_matches.sort(key=lambda x: x['similarity'], reverse=True)
+            
+            # Log top 5 similarity scores for debugging
+            self.logger.info(f"Top 5 similarity scores: {[f'{m["similarity"]:.4f}' for m in all_matches[:5]]}")
+            if all_matches:
+                self.logger.info(f"Highest similarity: {all_matches[0]['similarity']:.4f} for question: '{all_matches[0]['question']}'")
+                # Debug embedding values
+                self.logger.info(f"Query embedding shape: {query_emb.shape}, norm: {np.linalg.norm(query_emb):.4f}")
+                self.logger.info(f"First question embedding shape: {valid_embeddings[0].shape}, norm: {np.linalg.norm(valid_embeddings[0]):.4f}")
+            
+            # Sort matches above threshold by similarity (highest first) and limit results
+            matches.sort(key=lambda x: x['similarity'], reverse=True)
+            matches = matches[:max_matches]
+            
+            self.logger.info(f"Found {len(matches)} semantic matches above threshold {threshold:.3f}")
+            
+            # Convert to MatchResult objects
+            for match in matches:
+                match_result = MatchResult(
+                    text=match['question'],
+                    similarity_score=float(match['similarity']),
+                    exact_match=match['similarity'] >= 0.95,
+                    metadata={
+                        "benchmark_name": match['benchmark_name'],
+                        "benchmark_type": match['benchmark_type'],
+                        "embedding_model": self.model_name,
+                        "similarity_threshold": threshold
+                    }
+                )
+                results.append(match_result)
+            
+            conn.close()
+            
+        except Exception as e:
+            self.logger.error(f"Error in real semantic matching: {str(e)}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+        
+        return results
     
     def _mock_semantic_query(
         self, 

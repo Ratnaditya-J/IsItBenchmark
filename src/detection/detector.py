@@ -10,6 +10,8 @@ import logging
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 from .models import DetectionResult, BenchmarkMatch, BenchmarkType, BenchmarkInfo, MatchResult
 from ..similarity import create_matcher, MatcherType, BaseMatcher
 from ..benchmarks.database import BenchmarkDatabase
@@ -100,7 +102,9 @@ class BenchmarkDetector:
             processed_prompt = self.preprocessor.clean_text(prompt)
             
             # Get filtered benchmarks based on scope
-            candidates = self._get_filtered_benchmarks()
+            benchmark_infos = self._get_filtered_benchmarks()
+            # Convert BenchmarkInfo objects to dictionaries for matcher compatibility
+            candidates = [benchmark.to_dict() for benchmark in benchmark_infos]
             
             # Collect all matches from different detection methods
             all_matches = []
@@ -115,13 +119,23 @@ class BenchmarkDetector:
                 all_matches.extend(fuzzy_matches)
             
             # 3. Semantic/LLM matching using the configured matcher
-            matches = self.matcher.find_matches(
-                query=processed_prompt,
-                candidates=candidates,
-                threshold=self.similarity_threshold,
-                max_matches=self.max_matches
-            )
-            all_matches.extend(matches)
+            try:
+                logger.info(f"About to call matcher.find_matches with {len(candidates)} candidates")
+                matches = self.matcher.find_matches(
+                    query=processed_prompt,
+                    candidates=candidates,
+                    threshold=self.similarity_threshold,
+                    max_matches=self.max_matches
+                )
+                logger.info(f"Matcher returned {len(matches)} matches")
+                for i, match in enumerate(matches[:3]):  # Log first 3 matches
+                    logger.info(f"Match {i}: type={type(match)}, similarity={match.similarity_score}, metadata_keys={list(match.metadata.keys()) if hasattr(match, 'metadata') else 'no metadata'}")
+                all_matches.extend(matches)
+            except Exception as e:
+                logger.error(f"Error in matcher.find_matches: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                raise
             
             # Remove duplicates and sort by similarity score
             unique_matches = self._deduplicate_matches(all_matches)
@@ -131,8 +145,11 @@ class BenchmarkDetector:
                 reverse=True
             )[:self.max_matches]
             
+            # Convert MatchResult objects to BenchmarkMatch objects for probability calculation
+            benchmark_matches = self._convert_to_benchmark_matches(top_matches)
+            
             # Calculate overall probability
-            probability = self._calculate_probability(top_matches)
+            probability = self._calculate_probability(benchmark_matches)
             
             # Gather metadata
             analysis_time_ms = (time.time() - start_time) * 1000
@@ -150,7 +167,7 @@ class BenchmarkDetector:
                 input_prompt=prompt,
                 probability=probability,
                 confidence=None,  # Will be auto-set in __post_init__
-                matches=top_matches,
+                matches=benchmark_matches,
                 analysis_time_ms=analysis_time_ms,
                 metadata=metadata,
             )
@@ -172,7 +189,7 @@ class BenchmarkDetector:
         matches = []
         
         # Create a set of allowed benchmark names for filtering
-        allowed_benchmarks = {benchmark.name for benchmark in candidates}
+        allowed_benchmarks = {benchmark['name'] for benchmark in candidates}
         
         # Query database for exact matches
         exact_results = self.database.find_exact_matches(prompt)
@@ -199,7 +216,7 @@ class BenchmarkDetector:
         matches = []
         
         # Create a set of allowed benchmark names for filtering
-        allowed_benchmarks = {benchmark.name for benchmark in candidates}
+        allowed_benchmarks = {benchmark['name'] for benchmark in candidates}
         
         # Use search_questions for fuzzy matching (SQL LIKE matching)
         search_results = self.database.search_questions(prompt, limit=self.max_matches)
@@ -269,6 +286,37 @@ class BenchmarkDetector:
                         break
         
         return unique_matches
+    
+    def _convert_to_benchmark_matches(self, match_results: List[MatchResult]) -> List[BenchmarkMatch]:
+        """Convert MatchResult objects to BenchmarkMatch objects."""
+        benchmark_matches = []
+        
+        for match in match_results:
+            benchmark_name = match.metadata.get("benchmark_name", "Unknown")
+            benchmark_type_str = match.metadata.get("benchmark_type", "unknown")
+            
+            # Convert string to BenchmarkType enum
+            try:
+                if hasattr(benchmark_type_str, 'upper'):
+                    benchmark_type = BenchmarkType(benchmark_type_str.upper())
+                else:
+                    benchmark_type = BenchmarkType.SPECIALIZED
+            except (ValueError, AttributeError):
+                benchmark_type = BenchmarkType.SPECIALIZED
+            
+            benchmark_match = BenchmarkMatch(
+                benchmark_name=benchmark_name,
+                benchmark_type=benchmark_type,
+                similarity_score=match.similarity_score,
+                exact_match=match.exact_match,
+                matched_text=match.text,
+                source_url=match.metadata.get("source_url", ""),
+                publication_date=match.metadata.get("publication_date", ""),
+                dataset_version=match.metadata.get("dataset_version", "")
+            )
+            benchmark_matches.append(benchmark_match)
+        
+        return benchmark_matches
     
     def _calculate_probability(self, matches: List[BenchmarkMatch]) -> float:
         """

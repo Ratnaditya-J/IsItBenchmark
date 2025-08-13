@@ -117,19 +117,19 @@ class DetectionResult:
             "analysis_time_ms": self.analysis_time_ms,
             "matches": [
                 {
-                    "benchmark_name": match.benchmark_name,
-                    "benchmark_type": match.benchmark_type.value,
+                    "benchmark_name": match.metadata.get("benchmark_name", "Unknown"),
+                    "benchmark_type": match.metadata.get("benchmark_type", "unknown"),
                     "similarity_score": match.similarity_score,
                     "exact_match": match.exact_match,
-                    "matched_text": match.matched_text,
-                    "source_url": match.source_url,
-                    "publication_date": match.publication_date,
-                    "dataset_version": match.dataset_version,
+                    "matched_text": match.text,
+                    "source_url": match.metadata.get("source_url", ""),
+                    "publication_date": match.metadata.get("publication_date", ""),
+                    "dataset_version": match.metadata.get("dataset_version", ""),
                 }
                 for match in self.matches
             ],
             "top_match": {
-                "benchmark_name": self.top_match.benchmark_name,
+                "benchmark_name": self.top_match.metadata.get("benchmark_name", "Unknown"),
                 "similarity_score": self.top_match.similarity_score,
             } if self.top_match else None,
             "metadata": self.metadata,

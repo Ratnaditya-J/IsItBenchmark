@@ -16,7 +16,7 @@ from dataclasses import dataclass, asdict
 @dataclass
 class DetectionConfig:
     """Configuration for detection algorithms."""
-    similarity_threshold: float = 0.7
+    similarity_threshold: float = 0.55
     enable_semantic_matching: bool = True
     enable_fuzzy_matching: bool = True
     max_matches: int = 10
