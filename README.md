@@ -463,5 +463,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **IsItBenchmark** - Ensuring integrity in AI evaluation, one prompt at a time.
-
-*Built with ❤️ for the AI research community*
