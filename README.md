@@ -1,16 +1,16 @@
-# IsItBenchmark 🎯
+# IsItBenchmark 
 
 **Specialized Contamination Detection System for AI Benchmark Datasets**
 
 IsItBenchmark detects when training prompts contain benchmark questions using advanced machine learning techniques. This addresses the critical problem of data contamination in AI evaluation, ensuring fair and accurate model assessment.
 
-## 🎯 Motivation
+## Motivation
 
 ### Why I Created IsItBenchmark
 
 As AI models become increasingly powerful, a critical problem has emerged: **benchmark contamination**. Many large language models are inadvertently (or deliberately) trained on benchmark datasets, leading to artificially inflated performance scores that don't reflect true capabilities.
 
-### 📚 Research Foundation
+### Research Foundation
 
 This problem is well-documented in academic literature:
 - **[[Data Contamination Survey](https://arxiv.org/abs/2406.04244)]** - Comprehensive analysis of benchmark data contamination in LLMs
@@ -19,41 +19,41 @@ This problem is well-documented in academic literature:
 - **[[LiveBench](https://arxiv.org/abs/2406.19314)]** - Contamination-resistant benchmark addressing evaluation integrity
 
 **The Problem:**
-- 📈 **Inflated Scores:** Models appear more capable than they actually are [[GPT-3/4 Contamination](https://arxiv.org/abs/2005.14165)]
-- 🔍 **Hidden Contamination:** Difficult to detect when models have seen test data
-- ⚖️ **Unfair Comparisons:** Contaminated models compete against clean models
-- 🏛️ **Research Integrity:** Academic and industry evaluations become unreliable
-- 💰 **Economic Impact:** Billions invested based on misleading benchmarks
-- 🎭 **Sophisticated Gaming:** Advanced techniques like "data laundering" can bypass detection
+- **Inflated Scores:** Models appear more capable than they actually are [[GPT-3/4 Contamination](https://arxiv.org/abs/2005.14165)]
+- **Hidden Contamination:** Difficult to detect when models have seen test data
+- **Unfair Comparisons:** Contaminated models compete against clean models
+- **Research Integrity:** Academic and industry evaluations become unreliable
+- **Economic Impact:** Billions invested based on misleading benchmarks
+- **Sophisticated Gaming:** Advanced techniques like "data laundering" can bypass detection
 
 **My Solution:**
 IsItBenchmark is a specialized system designed specifically to detect benchmark contamination using:
-- 🤖 **Custom-trained models** fine-tuned on 49,159+ benchmark questions
-- 🔬 **Multiple detection techniques** from academic research
-- ⚡ **Real-time analysis** with probability scoring
-- 🎯 **High accuracy** across diverse benchmark types
+- **Custom-trained models** fine-tuned on 49,159+ benchmark questions
+- **Multiple detection techniques** from academic research
+- **Real-time analysis** with probability scoring
+- **High accuracy** across diverse benchmark types
 
 ### Key Use Cases
 
-**🔬 Academic Research:**
+** Academic Research:**
 - Verify evaluation integrity before publication
 - Clean training datasets to prevent contamination
 - Validate benchmark novelty and uniqueness
 - Ensure reproducible research results
 
-**🏢 Enterprise & Industry:**
+** Enterprise & Industry:**
 - Audit AI vendor performance claims
 - Validate internal model evaluations
 - Meet regulatory compliance requirements
 - Ensure fair competitive assessments
 
-**🛡️ AI Safety & Governance:**
+** AI Safety & Governance:**
 - Third-party model certification
 - Government verification of AI capabilities
 - Standardized evaluation frameworks
 - Red team security assessments
 
-**📚 Educational:**
+** Educational:**
 - Prevent academic dishonesty in AI courses
 - Design fair homework and exams
 - Create original assessment materials
@@ -64,110 +64,110 @@ IsItBenchmark is a specialized system designed specifically to detect benchmark 
 IsItBenchmark offers multiple sophisticated detection techniques, each optimized for different types of contamination:
 
 ### 1. **Specialized Model Matcher** [[BDC Survey](https://arxiv.org/abs/2406.04244)] (Highest Accuracy)
-- **🤖 Custom-Trained:** World's first specialized contamination detection model
-- **🎯 Precision-Optimized:** 99.8%+ accuracy on contamination detection
-- **📚 Comprehensive Training:** Trained on 49,159+ benchmark questions across 9 datasets
-- **⚡ Fast Detection:** Optimized for real-time analysis
-- **🔬 Research-Backed:** Implements 14+ contamination patterns from academic literature
+- **Custom-Trained:** World's first specialized contamination detection model
+- **Precision-Optimized:** 99.8%+ accuracy on contamination detection
+- **Comprehensive Training:** Trained on 49,159+ benchmark questions across 9 datasets
+- **Fast Detection:** Optimized for real-time analysis
+- **Research-Backed:** Implements 14+ contamination patterns from academic literature
 - **Usage:** `python main.py analyze "prompt" --matcher specialized`
 
 ### 2. **Semantic Similarity Matcher** [[Sentence-BERT Paper](https://arxiv.org/abs/1908.10084)]
-- **📊 Vector-Based:** Uses sentence embeddings for semantic comparison
-- **🔄 Fuzzy Matching:** Detects paraphrased and modified questions
-- **🌐 Language Agnostic:** Works across different phrasings and languages
-- **⚖️ Threshold-Based:** Configurable similarity thresholds
+- **Vector-Based:** Uses sentence embeddings for semantic comparison
+- **Fuzzy Matching:** Detects paraphrased and modified questions
+- **Language Agnostic:** Works across different phrasings and languages
+- **Threshold-Based:** Configurable similarity thresholds
 - **Usage:** `python main.py analyze "prompt" --matcher semantic`
 
 ### 3. **LLM-Powered Matcher** [[GPT-4 Technical Report](https://arxiv.org/abs/2303.08774)]
-- **🧠 AI-Driven:** Uses large language models for contextual analysis
-- **🎭 Context-Aware:** Understands nuanced variations and reformulations
-- **📝 Explanation:** Provides detailed reasoning for matches
-- **🔧 Configurable:** Supports multiple LLM backends
+- **AI-Driven:** Uses large language models for contextual analysis
+- **Context-Aware:** Understands nuanced variations and reformulations
+- **Explanation:** Provides detailed reasoning for matches
+- **Configurable:** Supports multiple LLM backends
 - **Usage:** `python main.py analyze "prompt" --matcher llm`
 
 ### 4. **N-Gram Overlap Matcher** [[GPT-3 Paper](https://arxiv.org/abs/2005.14165)]
-- **📏 Statistical:** Character and word-level overlap analysis (13-gram for GPT-3, 50-char for GPT-4)
-- **⚡ Ultra-Fast:** Millisecond-level detection for large-scale processing
-- **🎚️ Tunable:** Configurable n-gram sizes and overlap thresholds
-- **📊 Precise:** Exact substring matching with statistical validation
+- **Statistical:** Character and word-level overlap analysis (13-gram for GPT-3, 50-char for GPT-4)
+- **Ultra-Fast:** Millisecond-level detection for large-scale processing
+- **Tunable:** Configurable n-gram sizes and overlap thresholds
+- **Precise:** Exact substring matching with statistical validation
 - **Usage:** `python main.py analyze "prompt" --matcher ngram`
 
 ### 5. **Membership Inference Matcher** [[Membership Inference Attacks](https://arxiv.org/abs/1610.05820)]
-- **🔬 Research-Grade:** Advanced statistical techniques from ML security
-- **📈 Probability-Based:** Calculates likelihood of training data membership
-- **🎯 Low False Positives:** Designed to minimize incorrect detections
-- **🔍 Deep Analysis:** Analyzes model behavior patterns
+- ** Research-Grade:** Advanced statistical techniques from ML security
+- **Probability-Based:** Calculates likelihood of training data membership
+- **Low False Positives:** Designed to minimize incorrect detections
+- **Deep Analysis:** Analyzes model behavior patterns
 - **Usage:** `python main.py analyze "prompt" --matcher membership`
 
 ### 6. **Ensemble Matcher** (Best Overall)
-- **🎼 Multi-Method:** Combines multiple detection techniques
-- **⚖️ Weighted Voting:** Intelligent aggregation of different matcher results
-- **🛡️ Robust:** Reduces false positives through consensus
-- **🎯 Balanced:** Optimizes for both accuracy and coverage
+- **Multi-Method:** Combines multiple detection techniques
+- **Weighted Voting:** Intelligent aggregation of different matcher results
+- **Robust:** Reduces false positives through consensus
+- **Balanced:** Optimizes for both accuracy and coverage
 - **Usage:** `python main.py analyze "prompt" --matcher ensemble`
 
 ### 7. **Auto-Selection** (Default)
-- **🤖 Intelligent:** Automatically selects the best available matcher
-- **📊 Performance-Optimized:** Prioritizes specialized model when available
-- **🔄 Fallback:** Gracefully degrades to ensemble if specialized model unavailable
-- **⚡ Zero-Config:** Works out of the box with optimal settings
+- **Intelligent:** Automatically selects the best available matcher
+- **Performance-Optimized:** Prioritizes specialized model when available
+- **Fallback:** Gracefully degrades to ensemble if specialized model unavailable
+- **Zero-Config:** Works out of the box with optimal settings
 - **Usage:** `python main.py analyze "prompt"` (default behavior)
 
-## 📊 Integrated Benchmark Datasets
+## Integrated Benchmark Datasets
 
 IsItBenchmark includes comprehensive coverage of major AI benchmark datasets across multiple domains:
 
 ### **Language Understanding & Reasoning**
-- **📚 MMLU (Massive Multitask Language Understanding)**
+- **MMLU (Massive Multitask Language Understanding)**
   - 57 subjects from elementary to professional level
   - 15,908 questions covering humanities, STEM, social sciences
   - Multiple choice format with detailed explanations
 
-- **🧠 HellaSwag**
+- **HellaSwag**
   - Commonsense natural language inference
   - 10,042 questions requiring contextual reasoning
   - Sentence completion with plausible distractors
 
-- **🔬 ARC (AI2 Reasoning Challenge)**
+- **ARC (AI2 Reasoning Challenge)**
   - Science exam questions for grade-school level
   - 7,787 questions (Challenge + Easy sets)
   - Multiple choice with scientific reasoning
 
-- **💭 CommonsenseQA**
+- **CommonsenseQA**
   - Commonsense reasoning over everyday situations
   - 12,247 questions requiring world knowledge
   - Multiple choice with commonsense inference
 
 ### **Mathematical & Logical Reasoning**
-- **🔢 GSM8K (Grade School Math 8K)**
+- **GSM8K (Grade School Math 8K)**
   - Grade school level math word problems
   - 8,792 questions requiring multi-step reasoning
   - Natural language solutions with numerical answers
 
 ### **Code Generation & Programming**
-- **💻 HumanEval**
+- **HumanEval**
   - Python programming problems
   - 164 hand-crafted coding challenges
   - Function completion with test cases
 
 ### **Truthfulness & Factuality**
-- **✅ TruthfulQA**
+- **TruthfulQA**
   - Questions designed to test truthful responses
   - 817 questions across 38 categories
   - Focuses on common misconceptions and falsehoods
 
-### **AI Safety & Security** 🛡️
-- **⚠️ AgentHarm**
+### **AI Safety & Security**
+- **AgentHarm**
   - Harmful behavior detection for AI agents
   - Safety-critical scenarios and edge cases
   - Designed to test responsible AI deployment
 
-- **🛡️ Aegis AI Content Safety Dataset**
+- **Aegis AI Content Safety Dataset**
   - Content moderation and safety evaluation
   - Harmful content detection across categories
   - Industry-standard safety benchmarks
 
-- **☢️ CBRN Safety Dataset**
+- **CBRN Safety Dataset**
   - Chemical, Biological, Radiological, Nuclear safety
   - Critical infrastructure protection scenarios
   - High-stakes safety evaluation framework
@@ -179,61 +179,61 @@ IsItBenchmark includes comprehensive coverage of major AI benchmark datasets acr
 - **Languages:** Primarily English with multilingual support planned
 - **Update Frequency:** Regular updates as new benchmarks emerge
 
-## 🤖 Custom Model Details
+## Custom Model Details
 
 **World's First Specialized Contamination Detection Model** - IsItBenchmark features custom-trained transformer models specifically designed for benchmark contamination detection.
 
 ### **Model Architecture Options**
 
 #### **1. DistilBERT (Recommended)**
-- **🏃‍♂️ Performance:** Fastest training and inference
-- **💾 Size:** 66M parameters, ~255MB
-- **⚡ Speed:** 15-20 minutes training time
-- **🎯 Accuracy:** 99.8% training accuracy
-- **💻 Hardware:** Optimized for CPU training
+- **Performance:** Fastest training and inference
+- **Size:** 66M parameters, ~255MB
+- **Speed:** 15-20 minutes training time
+- **Accuracy:** 99.8% training accuracy
+- **Hardware:** Optimized for CPU training
 - **Use Case:** Production deployment, real-time analysis
 
 #### **2. BERT-Base**
-- **🎯 Performance:** Higher accuracy than DistilBERT
-- **💾 Size:** 110M parameters, ~420MB
-- **⏱️ Speed:** 25-35 minutes training time
-- **🔬 Accuracy:** 99.9% training accuracy
-- **💻 Hardware:** CPU-compatible with more memory
+- **Performance:** Higher accuracy than DistilBERT
+- **Size:** 110M parameters, ~420MB
+- **Speed:** 25-35 minutes training time
+- **Accuracy:** 99.9% training accuracy
+- **Hardware:** CPU-compatible with more memory
 - **Use Case:** Research applications, maximum accuracy
 
 #### **3. RoBERTa-Base**
-- **🏆 Performance:** Highest accuracy available
-- **💾 Size:** 125M parameters, ~480MB
-- **⏳ Speed:** 35-45 minutes training time
-- **🎯 Accuracy:** 99.95% training accuracy
-- **💻 Hardware:** Requires 12GB+ RAM
+- **Performance:** Highest accuracy available
+- **Size:** 125M parameters, ~480MB
+- **Speed:** 35-45 minutes training time
+- **Accuracy:** 99.95% training accuracy
+- **Hardware:** Requires 12GB+ RAM
 - **Use Case:** Academic research, benchmark studies
 
 #### **4. GPT-2**
-- **🔄 Approach:** Generative contamination detection
-- **💾 Size:** 124M parameters, ~475MB
-- **⏱️ Speed:** 30-40 minutes training time
-- **🧠 Method:** Language modeling approach
-- **💻 Hardware:** CPU-compatible
+- **Approach:** Generative contamination detection
+- **Size:** 124M parameters, ~475MB
+- **Speed:** 30-40 minutes training time
+- **Method:** Language modeling approach
+- **Hardware:** CPU-compatible
 - **Use Case:** Experimental research, novel approaches
 
 #### **5. DialoGPT**
-- **💬 Specialization:** Conversation-focused detection
-- **💾 Size:** 117M parameters, ~450MB
-- **⏱️ Speed:** 25-35 minutes training time
-- **🎭 Method:** Dialogue-aware contamination detection
-- **💻 Hardware:** CPU-compatible
+- **Specialization:** Conversation-focused detection
+- **Size:** 117M parameters, ~450MB
+- **Speed:** 25-35 minutes training time
+- **Method:** Dialogue-aware contamination detection
+- **Hardware:** CPU-compatible
 - **Use Case:** Chatbot evaluation, conversational AI
 
 ### **Training Features**
-- **🔬 Research-Backed:** Implements 14+ contamination patterns from academic literature
-- **📊 Comprehensive Data:** Trained on 49,159+ questions across 9 benchmark datasets
-- **⚖️ Balanced Training:** Positive and negative examples with data augmentation
-- **🎯 High Precision:** Optimized to minimize false positives
-- **🔄 Robust Validation:** Cross-validation with held-out test sets
-- **📈 Performance Metrics:** Accuracy, precision, recall, F1-score tracking
+- **Research-Backed:** Implements 14+ contamination patterns from academic literature
+- **Comprehensive Data:** Trained on 49,159+ questions across 9 benchmark datasets
+- **⚖Balanced Training:** Positive and negative examples with data augmentation
+- **High Precision:** Optimized to minimize false positives
+- **Robust Validation:** Cross-validation with held-out test sets
+- **Performance Metrics:** Accuracy, precision, recall, F1-score tracking
 
-## 🚀 How to Use IsItBenchmark
+## How to Use IsItBenchmark
 
 ### **Step 1: Clone Repository**
 ```bash
@@ -271,14 +271,14 @@ python scripts/generate_pretrained_model.py --model dialogpt  # Conversation-foc
 
 **Training Output:**
 ```
-🤖 Training DistilBERT contamination detection model...
-📊 Loading 49,159 benchmark questions from 9 datasets
-⚡ Training on CPU with optimized batch size
-📈 Epoch 1/3: Loss 0.6218 → 0.1234
-📈 Epoch 2/3: Loss 0.1234 → 0.0456
-📈 Epoch 3/3: Loss 0.0456 → 0.0012
-✅ Training completed! Accuracy: 99.8%
-💾 Model saved to: models/pretrained_specialized_detector/
+Training DistilBERT contamination detection model...
+Loading 49,159 benchmark questions from 9 datasets
+Training on CPU with optimized batch size
+Epoch 1/3: Loss 0.6218 → 0.1234
+Epoch 2/3: Loss 0.1234 → 0.0456
+Epoch 3/3: Loss 0.0456 → 0.0012
+Training completed! Accuracy: 99.8%
+Model saved to: models/pretrained_specialized_detector/
 ```
 
 ### **Step 3: Use Detection Methods**
@@ -402,14 +402,14 @@ curl -X POST "http://localhost:8000/analyze" \
 }
 ```
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
-- **🏠 Local Processing:** All analysis performed locally by default
-- **🚫 No Data Storage:** Prompts not stored unless explicitly configured
-- **🔐 Secure API:** Optional authentication and rate limiting
-- **📋 Audit Logging:** Comprehensive logging for compliance requirements
+- **Local Processing:** All analysis performed locally by default
+- **No Data Storage:** Prompts not stored unless explicitly configured
+- **Secure API:** Optional authentication and rate limiting
+- **Audit Logging:** Comprehensive logging for compliance requirements
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are always welcome! Help me improve the specialized contamination detection system.
 
@@ -429,39 +429,39 @@ pytest tests/
 python main.py server --port 8000
 ```
 
-## 📈 Future Roadmap
+## Future Roadmap
 
 ### Phase 2: Advanced Research Methods
-- **🔬 Perplexity Analysis:** Statistical contamination detection
-- **📊 Output Distribution Comparison:** Model behavior analysis
-- **🔄 Sequential Analysis:** Generation order pattern detection
-- **📅 Chronological Analysis:** Timeline-based contamination detection
+- **Perplexity Analysis:** Statistical contamination detection
+- **Output Distribution Comparison:** Model behavior analysis
+- **Sequential Analysis:** Generation order pattern detection
+- **Chronological Analysis:** Timeline-based contamination detection
 
 ### Phase 3: Production Optimization
-- **⚡ Batch Processing:** Large-scale contamination detection
-- **🚀 Performance Optimization:** Faster inference and training
-- **🌐 Multi-language Support:** Global benchmark coverage
-- **🔧 Enterprise Features:** Advanced authentication and analytics
+- **Batch Processing:** Large-scale contamination detection
+- **Performance Optimization:** Faster inference and training
+- **Multi-language Support:** Global benchmark coverage
+- **Enterprise Features:** Advanced authentication and analytics
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- **🎓 Academic Research Community:** For benchmark datasets and contamination detection research
-- **🛠️ Open Source Libraries:** Transformers, scikit-learn, FastAPI, and other essential tools
-- **🤝 Early Adopters:** Beta testers and feedback providers
-- **🔬 AI Safety Researchers:** For highlighting the importance of evaluation integrity
+- ** Academic Research Community:** For benchmark datasets and contamination detection research
+- ** Open Source Libraries:** Transformers, scikit-learn, FastAPI, and other essential tools
+- ** Early Adopters:** Beta testers and feedback providers
+- ** AI Safety Researchers:** For highlighting the importance of evaluation integrity
 
-## 📞 Contact & Support
+## Contact & Support
 
-- **📂 Repository:** [github.com/Ratnaditya-J/IsItBenchmark](https://github.com/Ratnaditya-J/IsItBenchmark)
-- **🐛 Bug Reports:** [GitHub Issues](https://github.com/Ratnaditya-J/IsItBenchmark/issues)
-- **📧 Contact:** Open an issue for questions or collaboration opportunities
+- ** Repository:** [github.com/Ratnaditya-J/IsItBenchmark](https://github.com/Ratnaditya-J/IsItBenchmark)
+- ** Bug Reports:** [GitHub Issues](https://github.com/Ratnaditya-J/IsItBenchmark/issues)
+- ** Contact:** Open an issue for questions or collaboration opportunities
 
 ---
 
-**IsItBenchmark** - Ensuring integrity in AI evaluation, one prompt at a time. 🎯✨
+**IsItBenchmark** - Ensuring integrity in AI evaluation, one prompt at a time.
 
 *Built with ❤️ for the AI research community*
