@@ -1,6 +1,6 @@
 # IsItBenchmark 
 
-**Specialized Contamination Detection System for AI Benchmark Datasets**
+**Specialized Contamination Detection System for GenAI models**
 
 IsItBenchmark detects when training prompts contain benchmark questions using advanced machine learning techniques. This addresses the critical problem of data contamination in AI evaluation, ensuring fair and accurate model assessment.
 
