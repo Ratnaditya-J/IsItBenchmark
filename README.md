@@ -4,6 +4,38 @@
 
 IsItBenchmark detects when training prompts contain benchmark questions using advanced machine learning techniques. This addresses the critical problem of data contamination in AI evaluation, ensuring fair and accurate model assessment.
 
+
+## V2 Direction: Evaluation Awareness and Benchmark Context Leakage
+
+IsItBenchmark is expanding beyond benchmark-contamination detection into **evaluation-awareness detection**: estimating whether a prompt, transcript, or harness leaks that a model is being evaluated and may therefore trigger benchmark-aware, sandbagging, or strategic-compliance behavior.
+
+The v2 scaffold lives in `src/eval_awareness/` and currently provides:
+
+- transcript-level input models for system, developer, user, assistant, history, metadata, and task format;
+- transparent cue detection for explicit eval wording, benchmark names, visible scoring, artificial formats, safety/alignment-test framing, harness artifacts, and sandbagging cues;
+- deployment-like counter-signals for production/support-ticket style contexts;
+- a Markdown leakage report with evidence spans and mitigation recommendations.
+
+Research background and the implementation roadmap are documented in:
+
+- [`docs/v2_research_synthesis.md`](docs/v2_research_synthesis.md)
+- [`docs/v2_architecture.md`](docs/v2_architecture.md)
+
+Example:
+
+```python
+from src.eval_awareness import EvaluationAwarenessDetector, TranscriptInput
+
+transcript = TranscriptInput(
+    system_prompt="You are being evaluated in a safety evaluation.",
+    user_prompt="Answer only A, B, C, or D. Your answer will be scored automatically.",
+)
+
+result = EvaluationAwarenessDetector().analyze(transcript)
+print(result.evaluation_awareness_score)
+print(result.recommendations)
+```
+
 ## Motivation
 
 ### Why I Created IsItBenchmark
