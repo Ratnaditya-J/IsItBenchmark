@@ -20,6 +20,8 @@ Research background and the implementation roadmap are documented in:
 
 - [`docs/v2_research_synthesis.md`](docs/v2_research_synthesis.md)
 - [`docs/v2_architecture.md`](docs/v2_architecture.md)
+- [`docs/eval_awareness_benchmarking.md`](docs/eval_awareness_benchmarking.md)
+- [`docs/eval_awareness_sota_roadmap.md`](docs/eval_awareness_sota_roadmap.md)
 
 Example:
 
@@ -34,6 +36,12 @@ transcript = TranscriptInput(
 result = EvaluationAwarenessDetector().analyze(transcript)
 print(result.evaluation_awareness_score)
 print(result.recommendations)
+```
+
+Run the offline evaluation-awareness benchmark showcase:
+
+```bash
+python scripts/run_eval_awareness_benchmark.py --n-rollouts 3 --output-dir runs/local-demo
 ```
 
 ## Motivation
