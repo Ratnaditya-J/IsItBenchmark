@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IsItBenchmark — eval-awareness benchmark</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #111827;
+    background: #f9fafb;
+  }
+  header {
+    padding: 3rem 1.5rem 2rem;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 0.5rem; font-size: 2.25rem; }
+  header p { margin: 0; opacity: 0.85; }
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  section { background: white; padding: 1.75rem; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  h2 { color: #1f2937; margin-top: 0; }
+  ul { padding-left: 1.25rem; }
+  ul.runs { list-style: none; padding-left: 0; }
+  ul.runs li { padding: 0.45rem 0; border-bottom: 1px solid #e5e7eb; }
+  ul.runs li:last-child { border-bottom: 0; }
+  a { color: #4338ca; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: #f3f4f6; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
+  .pill { display: inline-block; padding: 0.15rem 0.5rem; background: #eef2ff; color: #3730a3; border-radius: 999px; font-size: 0.75rem; margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>IsItBenchmark</h1>
+  <p>Eval-awareness measurement platform — leakage detection, VEA judging, behavior shifts, and white-box probes.</p>
+</header>
+<main>
+  <section>
+    <h2>What this is</h2>
+    <p>
+      A reproducible benchmarking platform that asks: <em>can a model tell it is being
+      evaluated, does that change its behavior, and can we mitigate it?</em>
+      Each run produces a manifest, raw rollouts, statistical summaries, and an
+      interactive dashboard.
+    </p>
+    <p>
+      <span class="pill">Goodfire-style</span>
+      <span class="pill">arXiv:2605.05835</span>
+      <span class="pill">Apollo VEA</span>
+      <span class="pill">Petri 2.0 realism</span>
+      <span class="pill">white-box probes</span>
+    </p>
+  </section>
+
+  <section>
+    <h2>Published runs</h2>
+    <p>This page is auto-built by the <code>pages.yml</code> workflow whenever a
+      directory under <code>runs/</code> changes on <code>main</code>. Each run links to its
+      own dashboard.</p>
+    <ul class="runs" id="run-list">
+      <li><em>No runs published yet. Push a directory to <code>runs/&lt;run-id&gt;/</code> with an <code>index.html</code> and the workflow will publish it here.</em></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Reproduce a run</h2>
+    <pre style="overflow-x: auto; background: #111827; color: #e5e7eb; padding: 1rem; border-radius: 8px;"><code># Phase A — calibrate the judge
+python scripts/run_calibration_pilot.py generate --output-dir data/calibration --allow-network
+# (hand-label data/calibration/labelling.csv)
+python scripts/run_calibration_pilot.py score --labelled data/calibration/labelling.csv
+
+# Phase B — pilot
+python scripts/run_full_benchmark.py --mode pilot --output-dir runs/pilot --allow-network
+
+# Phase C — full benchmark
+python scripts/run_full_benchmark.py --mode full --output-dir runs/benchmark-v0 --allow-network
+
+# Phase D — white-box probes (open-weight model)
+python scripts/run_whitebox_sweep.py --model-id Qwen/Qwen2.5-7B \
+    --n-pairs 200 --output-dir whitebox/qwen-7b --steering --allow-network
+
+# Phase F — cross-protocol comparison
+python scripts/run_cross_protocol_comparison.py --output-dir runs/cross-protocol-v0 \
+    --n-prompts 100 --n-rollouts 5 --allow-network
+</code></pre>
+  </section>
+</main>
+</body>
+</html>

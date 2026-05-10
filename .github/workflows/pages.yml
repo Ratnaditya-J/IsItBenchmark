@@ -1,0 +1,78 @@
+name: Publish benchmark dashboard to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "runs/**"
+      - "docs/pages/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build site
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # Copy any benchmark runs into the site under /runs/<run-id>/.
+          if [ -d runs ]; then
+            for run in runs/*/; do
+              run_id=$(basename "$run")
+              dest="_site/runs/$run_id"
+              mkdir -p "$dest"
+              if [ -f "$run/index.html" ]; then
+                cp -r "$run/." "$dest/"
+              fi
+            done
+          fi
+          # Optional landing page from docs/pages/.
+          if [ -d docs/pages ]; then
+            cp -r docs/pages/. _site/
+          fi
+          # If no landing page, generate a minimal index that lists runs.
+          if [ ! -f _site/index.html ]; then
+            {
+              echo '<!doctype html>'
+              echo '<html><head><meta charset="utf-8"><title>IsItBenchmark runs</title></head>'
+              echo '<body><h1>IsItBenchmark — eval-awareness benchmark runs</h1><ul>'
+              for run in _site/runs/*/; do
+                if [ -d "$run" ]; then
+                  run_id=$(basename "$run")
+                  echo "<li><a href=\"runs/$run_id/\">$run_id</a></li>"
+                fi
+              done
+              echo '</ul></body></html>'
+            } > _site/index.html
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
