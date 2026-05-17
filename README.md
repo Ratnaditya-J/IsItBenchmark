@@ -5,44 +5,13 @@
 IsItBenchmark detects when training prompts contain benchmark questions using advanced machine learning techniques. This addresses the critical problem of data contamination in AI evaluation, ensuring fair and accurate model assessment.
 
 
-## V2 Direction: Evaluation Awareness and Benchmark Context Leakage
+## Related work: alignment-evals (spun off May 2026)
 
-IsItBenchmark is expanding beyond benchmark-contamination detection into **evaluation-awareness detection**: estimating whether a prompt, transcript, or harness leaks that a model is being evaluated and may therefore trigger benchmark-aware, sandbagging, or strategic-compliance behavior.
+The evaluation-awareness, sandbagging, and honesty-eval work that grew up alongside the contamination-detection codebase here was spun off into a dedicated repository: **[`Ratnaditya-J/alignment-evals`](https://github.com/Ratnaditya-J/alignment-evals)**.
 
-The v2 scaffold lives in `src/eval_awareness/` and currently provides:
+That repo contains the V1 paper, the pre-registered qwen3 safety mediation replication, blog drafts, the `src/eval_awareness/` library, and the analysis scripts. Commit history (including the pre-registration's original filing timestamp) was preserved via `git filter-repo`.
 
-- transcript-level input models for system, developer, user, assistant, history, metadata, and task format;
-- transparent cue detection for explicit eval wording, benchmark names, visible scoring, artificial formats, safety/alignment-test framing, harness artifacts, and sandbagging cues;
-- deployment-like counter-signals for production/support-ticket style contexts;
-- a Markdown leakage report with evidence spans and mitigation recommendations.
-
-Research background and the implementation roadmap are documented in:
-
-- [`docs/v2_research_synthesis.md`](docs/v2_research_synthesis.md)
-- [`docs/v2_architecture.md`](docs/v2_architecture.md)
-- [`docs/eval_awareness_benchmarking.md`](docs/eval_awareness_benchmarking.md)
-- [`docs/eval_awareness_sota_roadmap.md`](docs/eval_awareness_sota_roadmap.md)
-
-Example:
-
-```python
-from src.eval_awareness import EvaluationAwarenessDetector, TranscriptInput
-
-transcript = TranscriptInput(
-    system_prompt="You are being evaluated in a safety evaluation.",
-    user_prompt="Answer only A, B, C, or D. Your answer will be scored automatically.",
-)
-
-result = EvaluationAwarenessDetector().analyze(transcript)
-print(result.evaluation_awareness_score)
-print(result.recommendations)
-```
-
-Run the offline evaluation-awareness benchmark showcase:
-
-```bash
-python scripts/run_eval_awareness_benchmark.py --n-rollouts 3 --output-dir runs/local-demo
-```
+`IsItBenchmark` continues to focus on benchmark-contamination detection. The two codebases are now independent.
 
 ## Motivation
 
